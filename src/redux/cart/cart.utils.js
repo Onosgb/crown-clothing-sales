@@ -1,5 +1,4 @@
 export const addItemToCart = (cartItems, cartItemToAdd) => {
-    console.log('previous items', cartItems);
     const existingCartItems = cartItems.find(item => 
         item.id === cartItemToAdd.id);
 
