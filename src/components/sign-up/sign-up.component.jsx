@@ -2,7 +2,6 @@ import React from 'react';
 import FormInput from '../../components/form-input/form-input.compnent';
 import CustomButton from '../../components/custom-button/custom-button.component'
 import {auth, createUserProfileDocument} from '../../firebase/firebase.utils'
-import {createUserWithEmailAndPassword} from 'firebase/auth'
 import './sign-up.styles.scss';
 class SignUp extends React.Component {
 constructor() {
@@ -30,16 +29,16 @@ if(!displayName && !email) {
     return;
 }
 try{
-await createUserWithEmailAndPassword(auth, email, password).then(userCredentials => {
-    const {user} = userCredentials
-    createUserProfileDocument(user, {displayName});
+const {user} = await auth.createUserWithEmailAndPassword(email, password);
+
+await createUserProfileDocument(user, {displayName});
+
     this.setState({
      displayName: '',
      email: '',
      password: '',
      confirmPassword: '',
     })
-});
 } catch(err) {
     console.log('error: ' + err.message)
 }

@@ -2,7 +2,6 @@ import {Component} from 'react';
 import FormInput from '../form-input/form-input.compnent';
 import CustomButton from '../../components/custom-button/custom-button.component'
 import {auth, signInWithGoogle} from '../../firebase/firebase.utils';
-import {signInWithEmailAndPassword} from 'firebase/auth'
 import './sign-in.styles.scss';
 class SignIn extends Component {
     constructor(props) {
@@ -19,7 +18,7 @@ class SignIn extends Component {
         const {email, password} = this.state;
 
         try{
-       await signInWithEmailAndPassword(auth, email, password);
+       await auth.signInWithEmailAndPassword(email, password);
         this.setState({email: '', password: ''});
         } catch(e){
             alert('Invalid username and password');

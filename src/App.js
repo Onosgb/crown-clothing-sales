@@ -12,6 +12,7 @@ import {connect} from 'react-redux';
 import {setCurrentUser} from './redux/user/user.actions';
 import {selectcurrentUser} from './redux/user/user.selector'
 import {createStructuredSelector} from 'reselect';
+import {selectCollectionsForPreview} from './redux/shop/shop.selector';
 class App extends React.Component {
   unSubscribeFromAuth = null;
 
@@ -20,20 +21,21 @@ class App extends React.Component {
     this.unSubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       // if the user is authorized to access set the state 
       if(userAuth) {
-    const {userSnap, id} = await createUserProfileDocument(userAuth);
-      if(userSnap.exists()) {
-        setCurrentUser({
-            id,
-            ...userSnap.data()
-          }
-        );
-        return;
-      } 
+    const userRef =  await createUserProfileDocument(userAuth);
 
-      // set the user to null if the user does not exist
-      setCurrentUser(userAuth);
+    userRef.onSnapshot(snapshot => {
+      setCurrentUser({
+        id : snapshot.id,
+        ...snapshot.data()
       }
+    );
+
     })
+      }
+            // set the user to null if the user does not exist
+            setCurrentUser(userAuth);
+            // addCollectionDocuments('collections', collections.map(({title, items}) => ({title, items})))
+          })
   }
 
   componentWillUnmount() {
@@ -60,11 +62,12 @@ class App extends React.Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectcurrentUser
+  currentUser: selectcurrentUser,
+  collections: selectCollectionsForPreview
 })
 
 const mapDispatchToProps = dispatch => ({
-setCurrentUser : user => dispatch(setCurrentUser(user))
+setCurrentUser : user => dispatch(setCurrentUser(user)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps) (App);

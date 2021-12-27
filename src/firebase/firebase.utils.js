@@ -1,9 +1,9 @@
-
-import { initializeApp} from 'firebase/app';
-import { GoogleAuthProvider, signInWithPopup, getAuth} from "firebase/auth";
-import { getDoc,doc, setDoc, getFirestore  } from "firebase/firestore"; 
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import 'firebase/firestore';
-const firebaseConfig = {
+
+
+const config = {
     apiKey: "AIzaSyBhleD4Wh0kpkv2XZsScWBEfOSBkuHDIQo",
     authDomain: "crwn-db-438bb.firebaseapp.com",
     projectId: "crwn-db-438bb",
@@ -12,25 +12,31 @@ const firebaseConfig = {
     appId: "1:224687188429:web:5c007073ff4ecd0e213c84",
     measurementId: "G-98Y1XKC6H6"
   };
-  const app = initializeApp(firebaseConfig);
 
-  const db = getFirestore();
-  export const auth = getAuth();
+  if (!firebase.apps.length) {
+    firebase.initializeApp(config);
+ }else {
+    firebase.app(); // if already initialized, use that one
+ }
 
+export const auth = firebase.auth();
+
+export const firestore = firebase.firestore();
+const provider = new firebase.auth.GoogleAuthProvider();
 
   export const createUserProfileDocument = async (userAuth, additionalData) => {
     if(!userAuth) return;
-    let userRef = doc(db, "users", `${userAuth.uid}`);
+    const userRef = firestore.doc(`users/${userAuth.uid}`);
 
-    const userSnap = await getDoc(userRef);
+    const snapshot = await userRef.get();
 
     // if user does not exist create the  new user
-    if (!userSnap.exists()) {
+    if (!snapshot.exists) {
       const {displayName, email} = userAuth;
       const createAt = new Date()
 
       try {
-      userRef = await setDoc(doc(db, 'users', `${userAuth.uid}`), {
+    await userRef.set({
           displayName,
           email,
           createAt,
@@ -41,13 +47,43 @@ const firebaseConfig = {
       }
 
     } 
-
-    return ({userSnap, id: userRef ? userRef.uid : userAuth.uid });
+    return userRef;
     
   }
 
-  const provider = new GoogleAuthProvider();
+ export const convertCollectionSnapshotToMap = (collections) => {
+    const transoformCollection = collections.docs.map(doc => {
+      const {title, items} = doc.data()
+      return {
+        routeName: encodeURI(title.toLowerCase()),
+        id: doc.id,
+        title,
+        items
+      }
+    })
+   return  transoformCollection.reduce((accumulator, collection) =>{
+   accumulator[collection.title.toLowerCase()] = collection
+     return accumulator;
+   }
+   ,
+   {});
+
+  }
+   
+
   provider.setCustomParameters({prompt: 'select_account'});
-  
-  export const signInWithGoogle = () => signInWithPopup(auth, provider);
-  export default app;
+  export const addCollectionDocuments = async (collectionKey, objectsToAdd)  => {
+    const collectionRef = firestore.collection(collectionKey);
+    
+    const batch = firestore.batch();
+    objectsToAdd.forEach(obj => {
+      const newDocRef = collectionRef.doc();
+      console.log(newDocRef)
+    batch.set(newDocRef, obj);
+    });
+
+    await batch.commit();
+  }
+
+  export const signInWithGoogle = () => auth.signInWithPopup(provider)
+  export default firebase;
