@@ -1,18 +1,16 @@
 import React from 'react';
+import {connect} from 'react-redux'
 import './App.css';
 import HomePage from './pages/homepage/homepage.component';
 import {Route, Switch, Redirect} from 'react-router-dom';
 import ShopPage from './pages/shop/shop.component';
-import Header from './components/header/header.component';
+import HeaderContainer from './components/header/header.container';
 import {auth, createUserProfileDocument} from './firebase/firebase.utils'
 import SignInAndSignUpPage from './pages/signin-and-signup/signin-and-signup.component';
-import CheckoutPage from './pages/checkout/checkout.component';
-import CollectionPage from './pages/collection/collecton.component';
-import {connect} from 'react-redux';
+import CheckoutPageContainer from './pages/checkout/checkout.container';
+import CollectionPageContainer from './pages/collection/collection.container';
 import {setCurrentUser} from './redux/user/user.actions';
-import {selectcurrentUser} from './redux/user/user.selector'
-import {createStructuredSelector} from 'reselect';
-import {selectCollectionsForPreview} from './redux/shop/shop.selector';
+
 class App extends React.Component {
   unSubscribeFromAuth = null;
 
@@ -45,12 +43,12 @@ class App extends React.Component {
  render() {
   return (
     <div >
-      <Header/>
+      <HeaderContainer/>
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route exact path="/shop" component={ShopPage} />
-          <Route exact path="/checkout" component={CheckoutPage} />
-          <Route  exact path="/shop/:collectionId" component={CollectionPage} />
+          <Route exact path="/checkout" component={CheckoutPageContainer} />
+          <Route  exact path="/shop/:collectionId" component={CollectionPageContainer} />
           <Route exact path="/signin" 
             render={() => this.props.currentUser ?
              (<Redirect to='/'/>) :
@@ -61,13 +59,8 @@ class App extends React.Component {
  }
 }
 
-const mapStateToProps = createStructuredSelector({
-  currentUser: selectcurrentUser,
-  collections: selectCollectionsForPreview
-})
-
 const mapDispatchToProps = dispatch => ({
 setCurrentUser : user => dispatch(setCurrentUser(user)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps) (App);
+export default connect(null, mapDispatchToProps) (App);
