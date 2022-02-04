@@ -8,7 +8,7 @@ const mapStateToProps = createStructuredSelector({
     sections: selectDirectorySections
 })
 
-const DirectoryContainer = connect(mapStateToProps) (Directory)
+const DirectoryContainer = connect(mapStateToProps)(Directory)
 
 export default DirectoryContainer;
 

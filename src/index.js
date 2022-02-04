@@ -3,11 +3,10 @@ import ReactDOM from 'react-dom';
 import {BrowserRouter} from 'react-router-dom';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
-
+import AppContainer from './App.container'
 import {store, persistor} from './redux/store';
-
 import './index.css';
-import AppContainer from './App.container';
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

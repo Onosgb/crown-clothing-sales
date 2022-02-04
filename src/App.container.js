@@ -1,15 +1,18 @@
 import {connect} from 'react-redux';
 import {selectcurrentUser} from './redux/user/user.selector'
 import {createStructuredSelector} from 'reselect';
-import {selectCollectionsForPreview} from './redux/shop/shop.selector';
 import App from './App'
-
+import {checkUserSession} from './redux/user/user.actions';
 
 const mapStateToProps = createStructuredSelector({
-    currentUser: selectcurrentUser,
-    collections: selectCollectionsForPreview
+    currentUser: selectcurrentUser
   })
 
-  const AppContainer = connect(mapStateToProps)(App);
+  const mapDispatchToProps = dispatch => ({
+    checkUserSession: () => dispatch(checkUserSession())
+  })
+  
+  
+  const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);
 
   export default AppContainer;

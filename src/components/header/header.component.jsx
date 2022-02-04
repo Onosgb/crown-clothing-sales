@@ -1,9 +1,8 @@
-import {auth} from '../../firebase/firebase.utils';
 import {ReactComponent as Logo} from '../../assets/crown.svg';
 import CartIcon from '../cart-icon/cart-icon.component'
 import CartDropdownContainer from '../cart-dropdown/cart-dropdown.container';
 import { HeaderContainer, LogoContainer, OptionsContainer, OptionLink} from './header.styles';
-const Header = ({currentUser, hidden}) => (
+const Header = ({currentUser, hidden, signOutStart}) => (
     <HeaderContainer>
         <LogoContainer to="/">
         <Logo className="logo"/>
@@ -18,7 +17,7 @@ const Header = ({currentUser, hidden}) => (
             </OptionLink>
 
             {
-                currentUser ? <OptionLink as="div"  onClick={ () => auth.signOut()}>Sign Out</OptionLink>
+                currentUser ? <OptionLink as="div"  onClick={signOutStart}>Sign Out</OptionLink>
                 :
             <OptionLink to="/signin">
                 SIGNIN

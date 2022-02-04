@@ -22,19 +22,17 @@ const config = {
 export const auth = firebase.auth();
 
 export const firestore = firebase.firestore();
-const provider = new firebase.auth.GoogleAuthProvider();
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
 
   export const createUserProfileDocument = async (userAuth, additionalData) => {
     if(!userAuth) return;
     const userRef = firestore.doc(`users/${userAuth.uid}`);
-
     const snapshot = await userRef.get();
 
     // if user does not exist create the  new user
     if (!snapshot.exists) {
       const {displayName, email} = userAuth;
       const createAt = new Date()
-
       try {
     await userRef.set({
           displayName,
@@ -71,7 +69,17 @@ const provider = new firebase.auth.GoogleAuthProvider();
   }
    
 
-  provider.setCustomParameters({prompt: 'select_account'});
+    export const getCurrentUser = () => {
+      return new Promise((resolve, reject) => {
+        const unsubscribe = auth.onAuthStateChanged(userAuth => {
+          unsubscribe()
+          resolve(userAuth)
+        }, reject);
+      })
+    }
+
+    
+  googleProvider.setCustomParameters({prompt: 'select_account'});
   export const addCollectionDocuments = async (collectionKey, objectsToAdd)  => {
     const collectionRef = firestore.collection(collectionKey);
     
@@ -85,5 +93,5 @@ const provider = new firebase.auth.GoogleAuthProvider();
     await batch.commit();
   }
 
-  export const signInWithGoogle = () => auth.signInWithPopup(provider)
+  export const signInWithGoogle = () => auth.signInWithPopup(googleProvider)
   export default firebase;

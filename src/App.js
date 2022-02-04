@@ -1,46 +1,28 @@
 import React from 'react';
-import {connect} from 'react-redux'
 import './App.css';
+
 import HomePage from './pages/homepage/homepage.component';
 import {Route, Switch, Redirect} from 'react-router-dom';
 import ShopPage from './pages/shop/shop.component';
 import HeaderContainer from './components/header/header.container';
-import {auth, createUserProfileDocument} from './firebase/firebase.utils'
 import SignInAndSignUpPage from './pages/signin-and-signup/signin-and-signup.component';
 import CheckoutPageContainer from './pages/checkout/checkout.container';
 import CollectionPageContainer from './pages/collection/collection.container';
-import {setCurrentUser} from './redux/user/user.actions';
 
 class App extends React.Component {
-  unSubscribeFromAuth = null;
-
+  unsubcribeAuth = null;
   componentDidMount() {
-    const {setCurrentUser} = this.props;
-    this.unSubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
-      // if the user is authorized to access set the state 
-      if(userAuth) {
-    const userRef =  await createUserProfileDocument(userAuth);
-
-    userRef.onSnapshot(snapshot => {
-      setCurrentUser({
-        id : snapshot.id,
-        ...snapshot.data()
-      }
-    );
-
-    })
-      }
-            // set the user to null if the user does not exist
-            setCurrentUser(userAuth);
-            // addCollectionDocuments('collections', collections.map(({title, items}) => ({title, items})))
-          })
+    const {checkUserSession} = this.props;
+    checkUserSession()
   }
 
-  componentWillUnmount() {
-    this.unSubscribeFromAuth();
+  compoponentWillMount() {
+    this.unsubcribeAuth();
   }
+
 
  render() {
+   const {currentUser} = this.props;
   return (
     <div >
       <HeaderContainer/>
@@ -50,7 +32,7 @@ class App extends React.Component {
           <Route exact path="/checkout" component={CheckoutPageContainer} />
           <Route  exact path="/shop/:collectionId" component={CollectionPageContainer} />
           <Route exact path="/signin" 
-            render={() => this.props.currentUser ?
+            render={() => currentUser ?
              (<Redirect to='/'/>) :
               (<SignInAndSignUpPage/>)} />
       </Switch>
@@ -59,8 +41,5 @@ class App extends React.Component {
  }
 }
 
-const mapDispatchToProps = dispatch => ({
-setCurrentUser : user => dispatch(setCurrentUser(user)),
-});
 
-export default connect(null, mapDispatchToProps) (App);
+export default App;
